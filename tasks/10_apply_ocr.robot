@@ -18,6 +18,7 @@ Apply OCR
 *** Keywords ***
 Process workload
     [Arguments]    ${workload}
+    sleep    1s
     ${error_index}    Evaluate    random.randint(0,4)    modules=random
     ${result}    Set Variable   ${ERROR_CHANCE}[${error_index}]
     [Return]    ${{ {'error' : ${result}} }}

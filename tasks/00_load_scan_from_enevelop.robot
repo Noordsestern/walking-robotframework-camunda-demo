@@ -17,4 +17,5 @@ Load scan from next envelope
 *** Keywords ***
 Process workload
     [Arguments]    ${workload}
+    sleep    1s
     [Return]    ${{ {'scanned' : True} }}
