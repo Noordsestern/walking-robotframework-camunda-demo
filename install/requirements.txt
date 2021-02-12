@@ -1,3 +1,4 @@
 robotframework
-robotframework-camunda
+robotframework-camunda>=1,<2
 robotframework-faker
+robotframework-ocrservice>=2,<3

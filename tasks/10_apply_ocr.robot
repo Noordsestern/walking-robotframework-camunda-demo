@@ -1,5 +1,6 @@
 *** Settings ***
-Library    CamundaLibrary.ExternalTask    ${CAMUNDA_HOST}
+Library    CamundaLibrary   ${CAMUNDA_HOST}
+Library    OcrService    bcp_url=${bcp}[url]    bcp_key=${bcp}[key]    texel_url=${texel}[url]
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
@@ -9,7 +10,7 @@ ${TOPIC}    ocr
 *** Tasks ***
 Apply OCR
     FOR    ${i}    IN RANGE    ${MAX_WORKLOAD_PROCESSED}
-        ${workload}    fetch and lock workloads    ${TOPIC}
+        ${workload}    fetch workload    ${TOPIC}    lock_duration=1000
         Pass execution if    not ${workload}    ${i} workloads processed
         ${result}    Process workload    ${workload}
         complete task    ${result}
@@ -18,7 +19,6 @@ Apply OCR
 *** Keywords ***
 Process workload
     [Arguments]    ${workload}
-    sleep    1s
-    ${error_index}    Evaluate    random.randint(0,4)    modules=random
-    ${result}    Set Variable   ${ERROR_CHANCE}[${error_index}]
-    [Return]    ${{ {'error' : ${result}} }}
+    ${image_file}    Download file from variable    image_binary
+    ${text}    read text from image    ${image_file}
+    [Return]    ${{ {'text' : '${text}'} }}

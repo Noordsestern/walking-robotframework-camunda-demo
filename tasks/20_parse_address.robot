@@ -1,17 +1,16 @@
 *** Settings ***
-Library    CamundaLibrary.ExternalTask    ${CAMUNDA_HOST}
+Library    CamundaLibrary    ${CAMUNDA_HOST}
 Library    FakerLibrary    locale=fi_FI
 Library    Collections
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
-${TOPIC}    parse_address
-@{ERROR_CHANCE}    ${True}    ${False}
+${TOPIC}    identify_champion
 
 *** Tasks ***
 Parse Address
     FOR    ${i}    IN RANGE    ${MAX_WORKLOAD_PROCESSED}
-        ${workload}    fetch and lock workloads    ${TOPIC}
+        ${workload}    fetch workload    ${TOPIC}    lock_duration=1000
         Pass execution if    not ${workload}    ${i} workloads processed
         ${result}    Process workload    ${workload}
         complete task    ${result}
@@ -20,8 +19,6 @@ Parse Address
 *** Keywords ***
 Process workload
     [Arguments]    ${workload}
-    sleep    1s
-    Return from Keyword if    ${workload}[error]    ${{ {} }}
-    ${random_address}    Address
-    ${address}    Create Dictionary    address=${random_address}
-    [Return]    ${address}
+    ${is_known_automation_champion}    Evaluate    '${workload}[text]' in ['Robot Framework', 'Robocorp']
+    ${result}    Create Dictionary    known_champion=${is_known_automation_champion}
+    [Return]    ${result}

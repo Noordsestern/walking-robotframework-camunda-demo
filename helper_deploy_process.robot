@@ -1,5 +1,5 @@
 *** Settings ***
-Library    CamundaLibrary.Deployment    ${CAMUNDA_HOST}
+Library    CamundaLibrary    ${CAMUNDA_HOST}
 
 *** Tasks ***
 Deploy process

@@ -1,5 +1,6 @@
 *** Settings ***
-Library    CamundaLibrary.ExternalTask    ${CAMUNDA_HOST}
+Library    CamundaLibrary    ${CAMUNDA_HOST}
+Library    Collections
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
@@ -8,14 +9,8 @@ ${TOPIC}    load_scan
 *** Tasks ***
 Load scan from next envelope
     FOR    ${i}    IN RANGE    ${MAX_WORKLOAD_PROCESSED}
-        ${workload}    fetch and lock workloads    ${TOPIC}
+        ${workload}    fetch workload    ${TOPIC}
         Pass execution if    not ${workload}    ${i} workloads processed
-        ${result}    Process workload    ${workload}
-        complete task    ${result}    ${{ {'scan_file' : '${CURDIR}/resources/robot-framework.png' }}}
+        ${files}    Create Dictionary    image_binary=${workload}[test_file]
+        complete task    files=${files}
     END
-
-*** Keywords ***
-Process workload
-    [Arguments]    ${workload}
-    sleep    1s
-    [Return]    ${{ {'scanned' : True} }}
