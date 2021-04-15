@@ -1,15 +1,15 @@
 *** Settings ***
 Library    CamundaLibrary    ${CAMUNDA_HOST}
+Library    Collections
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
-${TOPIC}    read_qr_code
-@{ERROR_CHANCE}    ${True}    ${False}
+${TOPIC}    throw_dice
 
 *** Tasks ***
-Read QR Code
+Throw Dice
     FOR    ${i}    IN RANGE    ${MAX_WORKLOAD_PROCESSED}
-        ${workload}    fetch workload    ${TOPIC}    lock_duration=1000
+        ${workload}    fetch workload    ${TOPIC}    lock_duration=1000    async_response_timeout=5000
         Pass execution if    not ${workload}    ${i} workloads processed
         ${result}    Process workload    ${workload}
         complete task    ${result}
@@ -18,6 +18,6 @@ Read QR Code
 *** Keywords ***
 Process workload
     [Arguments]    ${workload}
-    sleep    1s
-    ${qr_code}    Evaluate    random.randint(1,6)    modules=random
-    [Return]    ${{ {'dice' : ${qr_code}} }}
+    ${dice_result}    Evaluate    random.randint(1, 6)    modules=random
+    ${result}    Create Dictionary    dice=${dice_result}
+    [Return]    ${result}
