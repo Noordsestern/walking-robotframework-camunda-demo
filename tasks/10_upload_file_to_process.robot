@@ -1,20 +1,16 @@
 *** Settings ***
 Library    CamundaLibrary    ${CAMUNDA_HOST}
+Library    Collections
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
 ${TOPIC}    load_scan
 
 *** Tasks ***
-Publish results
+Upload file to process
     FOR    ${i}    IN RANGE    ${MAX_WORKLOAD_PROCESSED}
-        ${workload}    fetch and lock workloads    ${TOPIC}
+        ${workload}    fetch workload    ${TOPIC}
         Pass execution if    not ${workload}    ${i} workloads processed
-        Process workload    ${workload}
-        complete task
+        ${files}    Create Dictionary    image_binary=${workload}[test_file]
+        complete task    files=${files}
     END
-
-*** Keywords ***
-Process workload
-    [Arguments]    ${workload}
-    sleep    1s
